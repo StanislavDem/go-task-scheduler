@@ -29,11 +29,11 @@
 - DBFile = "../dataBase/scheduler.db"
 - FullNextDate = true
 - Search = true
-- Token = `azimut`
+- Token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJoYXNoIjoiMTIzNDUifQ.qWbN6gDEb1hNpfdEEz8G-B0_cwJerr_PzrhwNlVK0Kk"
 
 ###### Запуск локального сервера
 **bash**
-`go run ./cmd`
+`TODO_PASSWORD=12345 go run ./cmd`
 
 Ссылка на стартовую страницу: http://localhost:7540/login.html
 	
@@ -41,7 +41,7 @@
 
 1. Ссылка на репозиторий: https://hub.docker.com/r/fars1r/go-task-scheduler
 2. Команда для загрузки образа:
-- `docker pull fars1r/go-task-scheduler:v1`
+- `docker pull fars1r/go-task-scheduler:latest`
 3. Запуск контейнера и монтирование DB через PowerShell: 
-- `docker run -d --name go-task-scheduler -p 7540:7540 -v ${PWD}/dataBase/scheduler.db:/dataBase/scheduler.db fars1r/go-task-scheduler:v1`
+- `docker run -d --name go-task-scheduler -p 7540:7540 -e TODO_PASSWORD=12345 -v "${PWD}/dataBase:/dataBase" fars1r/go-task-scheduler:latest`
 4. Ссылка на стартовую страницу: http://localhost:7540/login.html

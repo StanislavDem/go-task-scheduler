@@ -7,18 +7,18 @@ import (
     "os"
     "path/filepath"
 
-    "github.com/StanislavDem/go-final-project/pkg/api"
-    "github.com/StanislavDem/go-final-project/tests"
+    "github.com/StanislavDem/go-task-scheduler/pkg/api"
+    "github.com/StanislavDem/go-task-scheduler/tests"
 )
 
-func StartServer() {
+func StartServer() error {
 	// регистрируем API-обработчики
     api.Init()
 	
 	// Определяем корневую папку относительно исполняемого файла
     exePath, err := os.Executable()
     if err != nil {
-        log.Fatal(err)
+        return fmt.Errorf("failed to get executable path: %w", err)
     }
     rootPath := filepath.Dir(exePath)
 	
@@ -35,10 +35,12 @@ func StartServer() {
 
     // StripPrefix для того чтобы "/" вело прямо в webDir
     http.Handle("/", http.StripPrefix("/", fs))
-
+	
     addr := fmt.Sprintf(":%d", tests.Port) // порт берём из settings.go
     log.Printf("Server started on %s\n", addr)
     if err := http.ListenAndServe(addr, nil); err != nil {
-        log.Fatal(err)
+        return fmt.Errorf("http server error: %w", err)
     }
+	
+	return nil
 }

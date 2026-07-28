@@ -34,6 +34,8 @@ func Init(dbFile string) error {
     if install { // если нет таблицы и индекса, то создаем их
         _, err = DB.Exec(schema)
         if err != nil {
+			// при ошибке закрываем соединение
+            DB.Close()
             return err
         }
     }

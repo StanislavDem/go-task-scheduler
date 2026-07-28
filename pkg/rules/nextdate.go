@@ -1,4 +1,4 @@
-package db
+package rules
 
 import (
     "fmt"
@@ -111,7 +111,7 @@ func NextDate(now time.Time, dstart string, repeat string) (string, error) {
 		}
 		// если больше одного отрицательного и среди них нет -1, то считаем правило некорректным
 		if negCount > 1 && !hasMinusOne {
-			return "", nil
+			return "", fmt.Errorf("invalid rule")
 		}
 		
         validMonths := make(map[int]bool)
@@ -126,22 +126,22 @@ func NextDate(now time.Time, dstart string, repeat string) (string, error) {
             }
         }
 
-    for {
-        date = date.AddDate(0, 0, 1) // двигаем по одному дню
-        day := date.Day()
-        lastDay := time.Date(date.Year(), date.Month()+1, 0, 0, 0, 0, 0, date.Location()).Day()
+		for {
+			date = date.AddDate(0, 0, 1) // двигаем по одному дню
+			day := date.Day()
+			lastDay := time.Date(date.Year(), date.Month()+1, 0, 0, 0, 0, 0, date.Location()).Day()
             
-		// проверка обычных и отрицательных дней
-		if validDays[day] && isValidMonthAndAfter(date, validMonths, now) {
-            return date.Format(DateFormat), nil
-		}
+			// проверка обычных и отрицательных дней
+			if validDays[day] && isValidMonthAndAfter(date, validMonths, now) {
+				return date.Format(DateFormat), nil
+			}
 
-		// проверка отрицательных индексов (-1 = последний день, -2 = предпоследний и т.д.)
-		negIndex := day - lastDay - 1
-		if validDays[negIndex] && isValidMonthAndAfter(date, validMonths, now) {
-            return date.Format(DateFormat), nil
-        }
-	}
+			// проверка отрицательных индексов (-1 = последний день, -2 = предпоследний и т.д.)
+			negIndex := day - lastDay - 1
+			if validDays[negIndex] && isValidMonthAndAfter(date, validMonths, now) {
+				return date.Format(DateFormat), nil
+			}
+		}
 	
 	default:
         return "", fmt.Errorf("unknown repeat rule: %s", parts[0])

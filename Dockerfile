@@ -1,38 +1,36 @@
 # Этап сборки Go-приложения
-FROM golang:1.26.2 AS builder
+FROM golang:alpine AS builder
 
-# Рабочая директория
 WORKDIR /app
 
-# Копируем go.mod и go.sum для кеширования зависимостей
+# Копируем файлы зависимостей и загружаем их (кеширование слоев)
 COPY go.mod go.sum ./
 RUN go mod download
 
-# Копируем весь проект
+# Копируем исходный код
 COPY . .
 
-# Собираем бинарник из main.go
-RUN go build -o tracker ./cmd/main.go
+# Собираем бинарник: CGO_ENABLED=0 (Alpine)
+RUN CGO_ENABLED=0 GOOS=linux go build -o tracker ./cmd/main.go
 
 # Этап финального образа
-FROM ubuntu:latest
+FROM alpine:latest
 
 WORKDIR /app
 
-# Копируем бинарник из builder
+# Копируем скомпилированный бинарник из builder
 COPY --from=builder /app/tracker .
+
 # Копируем фронтенд
 COPY web ./web
 
-# Создаём папку для базы
-RUN mkdir /dataBase
-
 # Переменные окружения
-ENV TODO_PORT=7540
 ENV TODO_DBFILE=/dataBase/scheduler.db
-ENV TODO_PASSWORD=12345
 
-# Открываем порт
+# Создаём директорию под базу данных
+RUN mkdir -p /dataBase
+
+# Запускаемый порт по умолчанию
 EXPOSE 7540
 
 # Запуск приложения

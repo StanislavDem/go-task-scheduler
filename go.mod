@@ -1,4 +1,4 @@
-module github.com/StanislavDem/go-final-project
+module github.com/StanislavDem/go-task-scheduler
 
 go 1.26.2
 

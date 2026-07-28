@@ -5,9 +5,10 @@ import (
     "net/http"
 )
 
-func writeJson(w http.ResponseWriter, data any) { // любые данные для возврата
-	// заголовок ответа
+func writeJson(w http.ResponseWriter, status int, data interface{}) {
     w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	// сериализация data
-    json.NewEncoder(w).Encode(data)
+	w.WriteHeader(status)
+    if err := json.NewEncoder(w).Encode(data); err != nil {
+        http.Error(w, "failed to encode JSON", http.StatusInternalServerError)
+	}
 }

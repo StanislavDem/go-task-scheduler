@@ -4,6 +4,8 @@ import (
     "database/sql"
     "time"
 	"fmt"
+	
+	"github.com/StanislavDem/go-task-scheduler/pkg/rules"
 )
 
 type Task struct {
@@ -34,7 +36,7 @@ func Tasks(limit int, search string) ([]*Task, error) {
         // парсинг даты
         t, parseErr := time.Parse("02.01.2006", search)
         if parseErr == nil {
-            date := t.Format("20060102")
+            date := t.Format(rules.DateFormat)
             rows, err = DB.Query("SELECT id, date, title, comment, repeat FROM scheduler WHERE date = ? ORDER BY date ASC LIMIT ?", date, limit)
         } else {
             like := "%" + search + "%"
@@ -55,6 +57,11 @@ func Tasks(limit int, search string) ([]*Task, error) {
         }
         tasks = append(tasks, &t)
     }
+
+	// проверка ошибок курсора
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
 
     if tasks == nil { // нет задач
         tasks = []*Task{} // пустой слайс
